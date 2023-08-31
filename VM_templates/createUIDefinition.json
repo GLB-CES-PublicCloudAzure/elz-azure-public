@@ -1,0 +1,465 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+    "handler": "Microsoft.Azure.CreateUIDef",
+    "version": "0.1.2-preview",
+    "parameters": {
+        "basics": [
+            {
+                "name": "vmName",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Virtual Machine Name",
+                "toolTip": "The name of the Virtual Machine.",
+                "defaultValue": "VMtest",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[a-z0-9A-Z-]{3,15}$",
+                    "validationMessage": "The VM Name must be between 3 and 15 characters long and contain letters, numbers and hyphens only."
+                }
+            },
+            {
+                "name": "adminUsername",
+                "type": "Microsoft.Compute.UserNameTextBox",
+                "label": "Username",
+                "toolTip": "Admin username for the machine",
+                "defaultValue": "AzureUser",
+                "osPlatform": "Windows",
+                "constraints": {
+                    "required": true
+                }
+            },
+            {
+                "name": "password",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "Password",
+                    "confirmPassword": "Confirm password"
+                },
+                "toolTip": "Admin password for the virtual machine",
+                "constraints": {
+                    "required": true,
+                    "regex": "^(?=.*[A-Z])(?=.*[.!@#$%^&*()-_=+])(?=.*[0-9])(?=.*[a-z]).{8,40}$",
+                    "validationMessage": "Password must be at least 8 characters long, and contain upper case, lower case, number and symbol"
+                },
+                "options": {
+                    "hideConfirmation": false
+                },
+                "visible": true
+            }
+        ],
+        "steps": [
+            {
+                "name": "VirtualMachineConfig",
+                "label": "Virtual Machine Settings",
+                "subLabel": {
+                    "preValidation": "Configure the virtual machine's resources and settings",
+                    "postValidation": "Done"
+                },
+                "bladeTitle": "Virtual Machine Settings",
+                "elements": [
+                    {
+                        "name": "OSVersion",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Operating System Version",
+                        "defaultValue": "Windows Server 2019 Datacenter",
+                        "toolTip": "The OS Version for the VM Image",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "value": {
+                                        "publisher": "MicrosoftWindowsServer",
+                                        "offer": "WindowsServer",
+                                        "sku": "2012-Datacenter",
+                                        "version": "latest"
+                                    },
+                                    "label": "Windows Server 2012 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "MicrosoftWindowsServer",
+                                        "offer": "WindowsServer",
+                                        "sku": "2016-Datacenter",
+                                        "version": "latest"
+                                    },
+                                    "label": "Windows Server 2016 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "MicrosoftWindowsServer",
+                                        "offer": "WindowsServer",
+                                        "sku": "2019-Datacenter",
+                                        "version": "latest"
+                                    },
+                                    "label": "Windows Server 2019 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "RedHat",
+                                        "offer": "RHEL",
+                                        "sku": "6.10",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux RedHat 6.10"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "RedHat",
+                                        "offer": "RHEL",
+                                        "sku": "7_9",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux RedHat 7.9"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "RedHat",
+                                        "offer": "RHEL",
+                                        "sku": "8_3",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux RedHat 8.3"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "suse",
+                                        "offer": "sles-12-sp5",
+                                        "sku": "gen1",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux Suse 12 SP5"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "suse",
+                                        "offer": "sles-15-sp2",
+                                        "sku": "gen1",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux Suse 15 SP2"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "Canonical",
+                                        "offer": "ubuntuserver",
+                                        "sku": "16.04.0-LTS",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux Ubunutu 16.04 LTS"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "Canonical",
+                                        "offer": "ubuntuserver",
+                                        "sku": "18.04-LTS",
+                                        "version": "latest"
+                                    },
+                                    "label": "Linux Ubunutu 18.04 LTS"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-windows-server-2012-v2-0-1-l1",
+                                        "sku": "cis-ws2012-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Windows Server 2012 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-windows-server-2012-v2-0-1-l2",
+                                        "sku": "cis-ws2012-l2",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 2 Windows Server 2012 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-windows-server-2016-v1-0-0-l1",
+                                        "sku": "cis-ws2016-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Windows Server 2016 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-windows-server-2016-v1-0-0-l2",
+                                        "sku": "cis-ws2016-l2",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 2 Windows Server 2016 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-windows-server-2019-v1-0-0-l1",
+                                        "sku": "cis-ws2019-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Windows Server 2019 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-windows-server-2019-v1-0-0-l2",
+                                        "sku": "cis-ws2019-l2",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 2 Windows Server 2019 Datacenter"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-rhel-7-v2-2-0-l1",
+                                        "sku": "cis-rhel7-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Linux RedHat 7"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-rhel-7-l2",
+                                        "sku": "cis-rhel7-l2",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 2 Linux RedHat 7"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-rhel-8-l1",
+                                        "sku": "cis-rhel-8-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Linux RedHat 8"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-suse-linux-12-v2-0-0-l1",
+                                        "sku": "cis-suse12-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Linux Suse 12 SP5"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-suse15-l1",
+                                        "sku": "cis-suse15-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Linux Suse 15 SP2"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-ubuntu-linux-1604-v1-0-0-l1",
+                                        "sku": "cis-ubuntu1604-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Linux Ubunutu 16.04 LTS"
+                                },
+                                {
+                                    "value": {
+                                        "publisher": "center-for-internet-security-inc",
+                                        "offer": "cis-ubuntu-linux-1804-l1",
+                                        "sku": "cis-ubuntu1804-l1",
+                                        "version": "latest"
+                                    },
+                                    "label": "CIS Level 1 Linux Ubunutu 18.04 LTS"
+                                }
+                            ],
+                            "required": true
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "vmSize",
+                        "type": "Microsoft.Compute.SizeSelector",
+                        "label": "Virtual machine size",
+                        "toolTip": "The size of virtual machine to provision.",
+                        "recommendedSizes": [
+                            "Standard_D2_v2"
+                        ],
+                        "osPlatform": "Windows",
+                        "count": "1"
+                    },
+                    {
+                        "name": "OSdisktype",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "OS Disk Type",
+                        "placeholder": "",
+                        "defaultValue": "StandardSSD_LRS",
+                        "toolTip": "",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Standard HDD",
+                                    "value": "Standard_LRS"
+                                },
+                                {
+                                    "label": "Standard SDD",
+                                    "value": "StandardSSD_LRS"
+                                },
+                                {
+                                    "label": "Premium SSD (only for supported VM sizes)",
+                                    "value": "Premium_LRS"
+                                }
+                            ],
+                            "required": true
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "vnet",
+                        "type": "Microsoft.Network.VirtualNetworkCombo",
+                        "label": {
+                            "virtualNetwork": "Virtual network",
+                            "subnets": "Subnets"
+                        },
+                        "toolTip": {
+                            "virtualNetwork": "",
+                            "subnets": ""
+                        },
+                        "defaultValue": {
+                            "name": "NewVnet",
+                            "addressPrefixSize": "/16"
+                        },
+                        "constraints": {
+                            "minAddressPrefixSize": "/24"
+                        },
+                        "options": {
+                            "hideExisting": false
+                        },
+                        "subnets": {
+                            "subnet": {
+                                "label": "Subnet",
+                                "defaultValue": {
+                                    "name": "subnet-1",
+                                    "addressPrefixSize": "/24"
+                                },
+                                "constraints": {
+                                    "minAddressPrefixSize": "/26",
+                                    "minAddressCount": 12,
+                                    "requireContiguousAddresses": true
+                                }
+                            }
+                        },
+                        "visible": true
+                    }
+                ]
+            },
+            {
+                "name": "vmManagement",
+                "label": "Virtual Machine Management",
+                "bladeTitle": "Virtual Machine Settings",
+                "elements": [
+                    {
+                        "name": "EvidenManageOptionsGroup",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "Eviden Managed",
+                        "defaultValue": "Yes",
+                        "toolTip": "",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Yes",
+                                    "value": "True"
+                                },
+                                {
+                                    "label": "No",
+                                    "value": "False"
+                                }
+                            ],
+                            "required": true
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "EvidenAntimalwareOptionsGroup",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "Eviden Antimalware",
+                        "defaultValue": "Yes",
+                        "toolTip": "",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Yes",
+                                    "value": "True"
+                                },
+                                {
+                                    "label": "No",
+                                    "value": "False"
+                                }
+                            ],
+                            "required": false
+                        },
+                        "visible": "[equals(steps('vmManagement').EvidenManageOptionsGroup, 'True')]"
+                    },
+                    {
+                        "name": "EvidenComplianceOptionsGroup",
+                        "type": "Microsoft.Common.OptionsGroup",
+                        "label": "Eviden Compliance",
+                        "defaultValue": "Yes",
+                        "toolTip": "",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Yes",
+                                    "value": "True"
+                                },
+                                {
+                                    "label": "No",
+                                    "value": "False"
+                                }
+                            ],
+                            "required": false
+                        },
+                        "visible": "[equals(steps('vmManagement').EvidenManageOptionsGroup, 'True')]"
+                    },
+                    {
+                        "name": "EvidenBackupBox",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "Backup policy schedule",
+                        "toolTip": "The name of backup schedule policy for Virtual Machine",
+                        "defaultValue": "no-backup",
+                        "constraints": {
+                            "required": false
+                        },
+                        "visible": "[equals(steps('vmManagement').EvidenManageOptionsGroup, 'True')]"
+                    },
+                    {
+                        "name": "EvidenPatchingBox",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "Patching schedule",
+                        "toolTip": "The name of patching schedule for Virtual Machine",
+                        "defaultValue": "no-patching",
+                        "constraints": {
+                            "required": false
+                        },
+                        "visible": "[equals(steps('vmManagement').EvidenManageOptionsGroup, 'True')]"
+                    }
+                ]
+            }
+        ],
+        "outputs": {
+            "virtualMachineName": "[basics('vmName')]",
+            "virtualMachineSize": "[steps('VirtualMachineConfig').vmSize]",
+            "osversion": "[steps('VirtualMachineConfig').OSVersion]",
+            "adminUsername": "[basics('adminUsername')]",
+            "adminPassword": "[basics('password')]",
+            "osDiskType": "[steps('VirtualMachineConfig').OSdisktype]",
+            "networkResourceGroup": "[steps('VirtualMachineConfig').vnet.resourceGroup]",
+            "vnetName": "[steps('VirtualMachineConfig').vnet.name]",
+            "subnetName": "[steps('VirtualMachineConfig').vnet.subnets.subnet.name]",
+            "evidenmanaged": "[steps('vmManagement').EvidenManageOptionsGroup]",
+            "evidenantimalware": "[steps('vmManagement').EvidenAntimalwareOptionsGroup]",
+            "evidencompliance": "[steps('vmManagement').EvidenComplianceOptionsGroup]",
+            "evidenbackup": "[steps('vmManagement').EvidenBackupBox]",
+            "evidenatchingschedule": "[steps('vmManagement').EvidenPatchingBox]"
+        }
+    }
+}
