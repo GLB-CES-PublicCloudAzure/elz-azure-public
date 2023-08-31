@@ -1,0 +1,248 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "VMtest",
+            "metadata": {
+                "description": "The name of the virtual machine."
+            }
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+            "metadata": {
+                "description": "The size of the virtual machine."
+            }
+        },
+        "osversion": {
+            "type": "object",
+            "defaultValue": "Windows Server 2019 Datacenter",
+            "metadata": {
+                "description": "Version of Operating System"
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "AzureUser",
+            "metadata": {
+                "description": "The admin username for the virtual machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The admin password for the virtual machine."
+            }
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "StandardSSD_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "StandardSSD_LRS",
+                "Premium_LRS"
+            ],
+            "metadata": {
+                "description": "The OS disk Storage Type ."
+            }
+        },
+        "deployPublicIpAddress": {
+            "type": "string",
+            "defaultValue": "False",
+            "allowedValues": [
+                "True",
+                "False"
+            ],
+            "metadata": {
+                "description": "Deploy public ip address for virtual machine."
+            }
+        },
+        "networkResourceGroup": {
+            "type": "string",
+            "defaultValue": "test-sandbox",
+            "metadata": {
+                "description": "The Name of the resource group for network resources."
+            }
+        },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "test-sandbox-vnet",
+            "metadata": {
+                "description": "The name of the virtual network."
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "default",
+            "metadata": {
+                "description": "The name of the subnet in the virtual network."
+            }
+        },
+        "evidenmanaged": {
+            "type": "string",
+            "defaultValue": "True",
+            "allowedValues": [
+                "True",
+                "False"
+            ],
+            "metadata": {
+                "description": "Specify if the VM is Eviden Mananged: true or false"
+            }
+        },
+        "evidenantimalware": {
+            "type": "string",
+            "defaultValue": "False",
+            "allowedValues": [
+                "True",
+                "False"
+            ],
+            "metadata": {
+                "description": "Deploy Antimalware agent on VM: true or false"
+            }
+        },
+        "evidencompliance": {
+            "type": "string",
+            "defaultValue": "False",
+            "allowedValues": [
+                "True",
+                "False"
+            ],
+            "metadata": {
+                "description": "Deploy Qualys agent on VM: true or false"
+            }
+        },
+        "evidenbackup": {
+            "type": "string",
+            "defaultValue": "no-backup",
+            "metadata": {
+                "description": "Backup policy where VM should be added. Recovery Vault and VM should be on the same subscription"
+            }
+        },
+        "evidenpatchingschedule": {
+            "type": "string",
+            "defaultValue": "no-patching",
+            "metadata": {
+                "description": "Update management patching schedule where VM will be added"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "vnetId": "[resourceId(parameters('networkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "networkInterfaceName": "[concat(parameters('virtualMachineName'), '-nic0')]",
+        "publicIpAddressName": "[concat(parameters('virtualMachineName'), '-pip')]",
+        "publicIPAddress": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))]"
+        },
+        "plan": {
+            "name": "[if(equals(parameters('osversion').publisher, 'center-for-internet-security-inc'), parameters('osversion').sku,json('null'))]",
+            "product": "[if(equals(parameters('osversion').publisher, 'center-for-internet-security-inc'), parameters('osversion').offer,json('null'))]",
+            "publisher": "[if(equals(parameters('osversion').publisher, 'center-for-internet-security-inc'), parameters('osversion').publisher,json('null'))]"
+        },
+        "ipConfig": [
+            {
+                "name": "ipconfig1",
+                "properties": {
+                    "subnet": {
+                        "id": "[variables('subnetRef')]"
+                    },
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": "[if(equals(parameters('deployPublicIpAddress'), 'True'),variables('publicIPAddress'), json('null'))]"
+                }
+            }
+        ]
+    },
+    "resources": [
+        {
+            "condition": "[equals(parameters('deployPublicIpAddress'), 'True')]",
+            "comments": "public ip address for virtual maschine",
+            "name": "[variables('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2018-08-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "comments": "network card for virtual maschine",
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": "[variables('ipConfig')]"
+            }
+        },
+        {
+            "comments": "Virtual Machine",
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "plan": "[if(equals(parameters('osversion').publisher, 'center-for-internet-security-inc'),variables('plan'), json('null'))]",
+            "tags": {
+                "EvidenManaged": "[parameters('evidenmanaged')]",
+                "EvidenAntimalware": "[parameters('evidenantimalware')]",
+                "EvidenCompliance": "[parameters('evidencompliance')]",
+                "EvidenBackup": "[parameters('evidenbackup')]",
+                "EvidenPatching": "[parameters('evidenpatchingschedule')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": "[parameters('osversion')]",
+                    "osDisk": {
+                        "name": "[concat(parameters('virtualMachineName'),'-osdisk')]",
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "[parameters('osversion').publisher]",
+                        "offer": "[parameters('osversion').offer]",
+                        "sku": "[parameters('osversion').sku]",
+                        "version": "[parameters('osversion').version]"
+                    }
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                }
+            },
+            "identity": {
+                "type": "systemAssigned"
+            }
+        }
+    ],
+    "outputs": {
+        "VMSize": {
+            "type": "string",
+            "value": "[parameters('virtualMachineSize')]"
+        },
+        "osversion": {
+            "type": "object",
+            "value": "[parameters('osversion')]"
+        }
+    }
+}
