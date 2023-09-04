@@ -459,7 +459,7 @@
             "evidenantimalware": "[steps('vmManagement').EvidenAntimalwareOptionsGroup]",
             "evidencompliance": "[steps('vmManagement').EvidenComplianceOptionsGroup]",
             "evidenbackup": "[steps('vmManagement').EvidenBackupBox]",
-            "evidenatchingschedule": "[steps('vmManagement').EvidenPatchingBox]"
+            "evidenpatchingschedule": "[steps('vmManagement').EvidenPatchingBox]"
         }
     }
 }
