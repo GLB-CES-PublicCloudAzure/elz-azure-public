@@ -379,48 +379,6 @@
                         "visible": true
                     },
                     {
-                        "name": "EvidenAntimalwareOptionsGroup",
-                        "type": "Microsoft.Common.OptionsGroup",
-                        "label": "Eviden Antimalware",
-                        "defaultValue": "Yes",
-                        "toolTip": "",
-                        "constraints": {
-                            "allowedValues": [
-                                {
-                                    "label": "Yes",
-                                    "value": "True"
-                                },
-                                {
-                                    "label": "No",
-                                    "value": "False"
-                                }
-                            ],
-                            "required": false
-                        },
-                        "visible": "[equals(steps('vmManagement').EvidenManageOptionsGroup, 'True')]"
-                    },
-                    {
-                        "name": "EvidenComplianceOptionsGroup",
-                        "type": "Microsoft.Common.OptionsGroup",
-                        "label": "Eviden Compliance",
-                        "defaultValue": "Yes",
-                        "toolTip": "",
-                        "constraints": {
-                            "allowedValues": [
-                                {
-                                    "label": "Yes",
-                                    "value": "True"
-                                },
-                                {
-                                    "label": "No",
-                                    "value": "False"
-                                }
-                            ],
-                            "required": false
-                        },
-                        "visible": "[equals(steps('vmManagement').EvidenManageOptionsGroup, 'True')]"
-                    },
-                    {
                         "name": "EvidenBackupBox",
                         "type": "Microsoft.Common.TextBox",
                         "label": "Backup policy schedule",
@@ -456,8 +414,6 @@
             "vnetName": "[steps('VirtualMachineConfig').vnet.name]",
             "subnetName": "[steps('VirtualMachineConfig').vnet.subnets.subnet.name]",
             "evidenmanaged": "[steps('vmManagement').EvidenManageOptionsGroup]",
-            "evidenantimalware": "[steps('vmManagement').EvidenAntimalwareOptionsGroup]",
-            "evidencompliance": "[steps('vmManagement').EvidenComplianceOptionsGroup]",
             "evidenbackup": "[steps('vmManagement').EvidenBackupBox]",
             "evidenpatchingschedule": "[steps('vmManagement').EvidenPatchingBox]"
         }

@@ -91,28 +91,6 @@
                 "description": "Specify if the VM is Eviden Mananged: true or false"
             }
         },
-        "evidenantimalware": {
-            "type": "string",
-            "defaultValue": "False",
-            "allowedValues": [
-                "True",
-                "False"
-            ],
-            "metadata": {
-                "description": "Deploy Antimalware agent on VM: true or false"
-            }
-        },
-        "evidencompliance": {
-            "type": "string",
-            "defaultValue": "False",
-            "allowedValues": [
-                "True",
-                "False"
-            ],
-            "metadata": {
-                "description": "Deploy Qualys agent on VM: true or false"
-            }
-        },
         "evidenbackup": {
             "type": "string",
             "defaultValue": "no-backup",
@@ -192,8 +170,6 @@
             "plan": "[if(equals(parameters('osversion').publisher, 'center-for-internet-security-inc'),variables('plan'), json('null'))]",
             "tags": {
                 "EvidenManaged": "[parameters('evidenmanaged')]",
-                "EvidenAntimalware": "[parameters('evidenantimalware')]",
-                "EvidenCompliance": "[parameters('evidencompliance')]",
                 "EvidenBackup": "[parameters('evidenbackup')]",
                 "EvidenPatching": "[parameters('evidenpatchingschedule')]"
             },
@@ -202,7 +178,6 @@
                     "vmSize": "[parameters('virtualMachineSize')]"
                 },
                 "storageProfile": {
-                    "imageReference": "[parameters('osversion')]",
                     "osDisk": {
                         "name": "[concat(parameters('virtualMachineName'),'-osdisk')]",
                         "createOption": "fromImage",
