@@ -40,8 +40,6 @@ This ARM template requires the following parameters:
 - `networkInterfaceName`: The name of the network interface to use for the virtual machine.
 - `osDiskType`: The type of storage account to use for the virtual machine's OS disk.
 - `evidenmanaged`: A tag indicating whether the virtual machine is managed by Eviden.
-- `evidenantimalware`: A tag indicating whether the virtual machine has Eviden antimalware installed.
-- `evidencompliance`: A tag indicating whether the virtual machine is compliant with Eviden policies.
 - `evidenbackup`: A tag indicating whether the virtual machine is backed up by Eviden.
 - `evidenpatchingschedule`: A tag indicating the patching schedule for the virtual machine.
 
